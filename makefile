@@ -16,7 +16,7 @@ export CDEBUG = -g -DDEBUG
 # Constantes liees au projet
 #
 
-DIRS=sioux libs #EDR
+DIRS= libs sioux #EDR
 
 #
 # La cible generale

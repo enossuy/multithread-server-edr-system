@@ -1,39 +1,45 @@
+#include "../libs/Reseau/libserveur.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-int connect(int sockfd,struct sockaddr *address,socklen_t length);
+#include <sys/stat.h>
 
-int initialisationServeur(short int *port,int connexions){
+#define MAX_CONNEXIONS 5
+
+
+
+int main(int argc,char *argv[])
 {
+
 int s;
-struct sockaddr_in adresse;
-socklen_t taille=sizeof adresse;
-int statut;
 
-/* Creation d'une socket */
-s=socket(PF_INET,SOCK_STREAM,0);
-if(s<0){
-        perror("initialisationServeur.socket");
-        exit(-1);
+/* Lecture des arguments de la commande */
+short int port = analyseArguments(argc,argv); //service = port, char *service ?
+
+/* Initialisation du serveur */
+s=initialisationServeur(&port,MAX_CONNEXIONS);
+if(s<0)
+{ 
+        fprintf(stderr,"Port non utilisable\n"); 
+        exit(EXIT_FAILURE); 
         }
+else 
+        printf("Port libre !\n");
+   
+/* Lancement de la boucle d'ecoute */
+boucleServeur(s,gestionClient);
 
-/* Specification de l'adresse de la socket */
-adresse.sin_family=AF_INET;
-adresse.sin_addr.s_addr=INADDR_ANY;
-adresse.sin_port=htons(*port);
-statut=bind(s,(struct sockaddr *)&adresse,sizeof(adresse));
-if(statut<0) return -1;
 
-/* On recupere le numero du port utilise */
-statut=getsockname(s,(struct sockaddr *)&adresse,&taille);
-if(statut<0){
-        perror("initialisationServeur.getsockname");
-        exit(-1);
-        }
-*port=ntohs(adresse.sin_port);
 
-/* Taille de la queue d'attente */
-statut=listen(s,connexions);
-if(statut<0) return -1;
+return 0;
+} 
 
-return s;
-}
+
+
+
