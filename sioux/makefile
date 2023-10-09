@@ -1,0 +1,8 @@
+# Makefile sioux
+SOURCES = $(wildcard *.c)
+OBJECTS = $(SOURCES:.c=.o)
+TARGET = exec
+
+default:
+	gcc -c $(SOURCES)
+	gcc $(OBJECTS) -o $(TARGET)
