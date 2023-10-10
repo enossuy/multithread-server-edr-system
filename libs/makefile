@@ -6,5 +6,5 @@ default:
 
 
 clean:
-	cd Reseau/ && rm *.[ao]
+	cd Reseau/ && rm -f *.[ao]
 	cd ..

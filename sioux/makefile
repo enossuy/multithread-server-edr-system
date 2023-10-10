@@ -1,7 +1,7 @@
 # Makefile sioux
 SOURCES = $(wildcard *.c)
 OBJECTS = $(SOURCES:.c=.o)
-TARGET = exec
+TARGET = serveur_madz
 LDFLAGS =  -L../libs/Reseau -lserveur
 
 default:
@@ -10,4 +10,4 @@ default:
 
 
 clean:
-	rm *.o $(TARGET)
+	rm -f *.o $(TARGET)

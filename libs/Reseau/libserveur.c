@@ -9,19 +9,9 @@
 #include <netinet/tcp.h>
 #include <fcntl.h>
 #include <netdb.h>
-#include <getopt.h>
 #include "libserveur.h"
 
 
-#define MAX_LIGNE 100
-
-
-#define WEB_DIR  "./www" 
-#define PAGE_NOTFOUND "error.html"
-#define MAX_BUFFER 1024
-
-#define CODE_OK  200
-#define CODE_NOTFOUND 404
 
 int initialisationServeur(short int *port,int connexions){
 struct addrinfo precisions,*resultat,*origine;
@@ -87,128 +77,5 @@ while(1){
     }
 }
 
-int gestionClient(int s){
-
-FILE *dialogue=fdopen(s,"a+");
-  char cmd[MAX_BUFFER];
-  char page[MAX_BUFFER];
-  char proto[MAX_BUFFER];
-  char path[2048];
-  char type[MAX_BUFFER];
-if(dialogue==NULL){ perror("gestionClient.fdopen"); exit(EXIT_FAILURE); }
-
-char ligne[MAX_LIGNE];
-
-while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
-{
-  fprintf(dialogue,"> %s",ligne);
-  if(sscanf(ligne,"%s %s %s",cmd,page,proto)!=3) exit(-1);
-  fprintf(dialogue,"> cmd :%s page :%s proto:%s\n",cmd, page,proto);
-
-  /*On cherche si il ya "?""*/
-  char *page_arg = strtok(page, "?"); 
-
-    if (page_arg != NULL) {
-
-        fprintf(dialogue,"page extraite : %s\n", page);
-        
-        char *argument = strtok(NULL, "?");
-        if (argument != NULL) {
-            fprintf(dialogue,"argument dans la requete: %s\n", argument);
-        } else {
-            fprintf(dialogue,"pas d'argument dans la requete\n");
-        }
-    }
-
-
-  if(strcasecmp(cmd,"GET")==0){
-  int code=CODE_OK;
-  struct stat fstat;
-  sprintf(path,"%s%s",WEB_DIR,page_arg);
-  fprintf(dialogue,"> path : %s\n",path);
-
-  if(stat(path,&fstat)!=0 || !S_ISREG(fstat.st_mode)){
-    sprintf(path,"%s/%s",WEB_DIR,PAGE_NOTFOUND);
-    fprintf(dialogue,"page non trouvée\n");
-    code=CODE_NOTFOUND;
-    }
-  else{
-    fprintf(dialogue,"page trouvée\n");
-
-    strcpy(type,"text/html");
-    char *end=page+strlen(page);
-    if(strcmp(end-4,".png")==0) strcpy(type,"image/png");
-    if(strcmp(end-4,".jpg")==0) strcpy(type,"image/jpg");
-    if(strcmp(end-4,".gif")==0) strcpy(type,"image/gif");
-    fprintf(stdout,"HTTP/1.0 %d\r\n",code);
-    fprintf(stdout,"Server: CWeb\r\n");
-    fprintf(stdout,"Content-type: %s\r\n",type);
-    fprintf(stdout,"Content-length: %ld\r\n",fstat.st_size);
-    fprintf(stdout,"\r\n");
-    fflush(stdout);    
-
-
-
-    }
-  }
-}
-  
-/* Termine la connexion */
-fclose(dialogue);
-return 0;
-}
-
-void err_syntax(void)
-{
-    printf("Syntaxe incorecte : -p <port> ou --port <port>\n");
-}
-
-int parsing(int valopt, char *optarg)
-{
-    int port_num = -1;
-
-    switch (valopt)
-    {
-        case 0:
-        case 'p':
-
-            if (sscanf(optarg, "%d", &port_num) == 1) 
-                printf("Port : %d ", port_num);
-            else
-                err_syntax();
-            break;
-
-        case '?':
-            err_syntax();
-            break;
-    }
-
-    return port_num;
-}
-int analyseArguments(int argc,char *argv[]){
- static struct option long_options[] = {
-        {"port",     required_argument, 0,  'p' },
-        {0,     0, 0,  0 }
-        };
-
-    int option_index = 0;
-    int val_opt;
-    int port_num;
-    int i = 0;
-
-    while ((val_opt = getopt_long(argc, argv, "p:0",long_options, &option_index)) != -1) // si suivi de ":" ==> besoin d argument
-    {
-        port_num = parsing(val_opt,optarg);
-        i = 1;
-    }
-
-    if(i == 0)
-    {
-      printf("Port non spécifié\n");
-      exit(-1);
-    }
-
-    return port_num;
-}
 
 

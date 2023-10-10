@@ -15,7 +15,7 @@ all: $(CIBLE)
 #
 
 clean: 
-	rm -f core *.o $(CIBLE)
+	rm -f *.o $(CIBLE)
 
 #
 # Dependances pour la bibliotheque

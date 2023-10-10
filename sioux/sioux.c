@@ -1,4 +1,6 @@
 #include "../libs/Reseau/libserveur.h"
+#include "./options.h"
+#include "./analyste_http.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,26 +16,24 @@
 
 
 
-int main(int argc,char *argv[])
-{
+int main(int argc,char *argv[]){
 
-int s;
+        int s;
 
-/* Lecture des arguments de la commande */
-short int port = analyseArguments(argc,argv); //service = port, char *service ?
+        /* Lecture des arguments de la commande */
+        short int port = analyseArguments(argc,argv); //service = port, char *service ?
 
-/* Initialisation du serveur */
-s=initialisationServeur(&port,MAX_CONNEXIONS);
-if(s<0)
-{ 
-        fprintf(stderr,"Port non utilisable\n"); 
-        exit(EXIT_FAILURE); 
+        /* Initialisation du serveur */
+        s=initialisationServeur(&port,MAX_CONNEXIONS);
+        if(s<0){
+                fprintf(stderr,"Port non utilisable\n");
+                exit(EXIT_FAILURE);
         }
-else 
-        printf("Port libre !\n");
+        else
+                printf("Port libre !\n");
    
 /* Lancement de la boucle d'ecoute */
-boucleServeur(s,gestionClient);
+        boucleServeur(s,gestionClient);
 
 
 
