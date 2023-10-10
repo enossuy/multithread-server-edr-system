@@ -98,20 +98,38 @@ FILE *dialogue=fdopen(s,"a+");
 if(dialogue==NULL){ perror("gestionClient.fdopen"); exit(EXIT_FAILURE); }
 
 char ligne[MAX_LIGNE];
+
 while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
 {
   fprintf(dialogue,"> %s",ligne);
   if(sscanf(ligne,"%s %s %s",cmd,page,proto)!=3) exit(-1);
   fprintf(dialogue,"> cmd :%s page :%s proto:%s\n",cmd, page,proto);
+
+  /*On cherche si il ya "?""*/
+  char *page_arg = strtok(page, "?"); 
+
+    if (page_arg != NULL) {
+
+        fprintf(dialogue,"page extraite : %s\n", page);
+        
+        char *argument = strtok(NULL, "?");
+        if (argument != NULL) {
+            fprintf(dialogue,"argument dans la requete: %s\n", argument);
+        } else {
+            fprintf(dialogue,"pas d'argument dans la requete\n");
+        }
+    }
+
+
   if(strcasecmp(cmd,"GET")==0){
   int code=CODE_OK;
   struct stat fstat;
-  sprintf(path,"%s%s",WEB_DIR,page);
+  sprintf(path,"%s%s",WEB_DIR,page_arg);
   fprintf(dialogue,"> path : %s\n",path);
 
   if(stat(path,&fstat)!=0 || !S_ISREG(fstat.st_mode)){
     sprintf(path,"%s/%s",WEB_DIR,PAGE_NOTFOUND);
-    fprintf(dialogue,"page non trouvée");
+    fprintf(dialogue,"page non trouvée\n");
     code=CODE_NOTFOUND;
     }
   else{
