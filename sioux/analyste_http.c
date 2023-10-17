@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <fcntl.h>
 
 
 #define WEB_DIR  "./www"
@@ -13,7 +14,7 @@
 #define CODE_NOTFOUND 404
 
 
-#define MAX_LIGNE 100
+#define MAX_LIGNE 1024
 
 int gestionClient(int s){
 
@@ -40,10 +41,32 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
 
         fprintf(dialogue,"page extraite : %s\n", page);
 
+
+        char page_to_extract[MAX_BUFFER];
+        strcpy(page_to_extract,page);
+        char *csv = strtok(page_to_extract,".html");
+        char *csv_path;
+
+        size_t sizeCSV = strlen( WEB_DIR ) + 1 +  strlen( csv ) + 1;
+
+
+
+
+
+      if(strcmp("./www/",path) == 0)
+      strcpy(path,"./www/index.html");
+      else {
+        csv_path = (char *) malloc( sizeCSV );
+        strcpy(csv_path,WEB_DIR);
+        strcat(csv_path,csv);
+        strcat(csv_path,".csv");
+        fprintf(dialogue,"csv : %s\n",csv_path);
+      }
+
         char *argument = strtok(NULL, "?");
         if (argument != NULL) {
 
-            FILE *vote_csv=fopen("./www/vote-reponse.csv","a+");
+            FILE *vote_csv=fopen(csv_path,"a+");
             fprintf(dialogue,"argument dans la requete: %s\n", argument);
             fprintf(vote_csv,"%s;",argument);
             fclose(vote_csv);
@@ -60,8 +83,6 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
   sprintf(path,"%s%s",WEB_DIR,page_arg);
 
 
-  if(strcmp("./www/",path) == 0)
-      strcpy(path,"./www/index.html");
 
 
   fprintf(dialogue,"> path : %s\n",path);
@@ -84,9 +105,12 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
     fprintf(stdout,"Content-length: %ld\r\n",fstat.st_size);
     fprintf(stdout,"\r\n");
     fflush(stdout);
-
-
-
+    int fd=open(path,O_RDONLY);
+    if(fd>=0){
+    int bytes;
+    while((bytes=read(fd,ligne,MAX_BUFFER))>0) write(1,ligne,bytes);
+    close(fd);
+    }
     }
   }
 }
