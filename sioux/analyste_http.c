@@ -31,7 +31,12 @@ char ligne[MAX_LIGNE];
 while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
 {
   fprintf(dialogue,"> %s",ligne);
-  if(sscanf(ligne,"%s %s %s",cmd,page,proto)!=3) exit(-1);
+  if(sscanf(ligne,"%s %s %s",cmd,page,proto)!=3) 
+  {
+    printf("\033[91mCommande non reconnue, arrêt.\033[0m\r\n");
+    exit(-1);
+  }
+  
   fprintf(dialogue,"> cmd :%s page :%s proto:%s\n",cmd, page,proto);
 
   /*On cherche si il ya "?""*/
@@ -39,22 +44,21 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
 
     if (page_arg != NULL) {
 
-        fprintf(dialogue,"page extraite : %s\n", page);
+      fprintf(dialogue,"page extraite : %s\n", page);
 
 
-        char page_to_extract[MAX_BUFFER];
-        strcpy(page_to_extract,page);
-        char *csv = strtok(page_to_extract,".html");
-        char *csv_path;
+      char page_to_extract[MAX_BUFFER];
+      strcpy(page_to_extract,page);
+      char *csv = strtok(page_to_extract,".html");
+      char *csv_path;
 
-        size_t sizeCSV = strlen( WEB_DIR ) + 1 +  strlen( csv ) + 1;
-
-
-
-
-
+      size_t sizeCSV = strlen( WEB_DIR ) + 1 +  strlen( csv ) + 1;
+      sprintf(path,"%s%s",WEB_DIR,page_arg);
+      
       if(strcmp("./www/",path) == 0)
-      strcpy(path,"./www/index.html");
+      {
+        strcpy(path,"./www/index.html");
+      }
       else {
         csv_path = (char *) malloc( sizeCSV );
         strcpy(csv_path,WEB_DIR);
@@ -80,10 +84,6 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
   if(strcasecmp(cmd,"GET")==0){
   int code=CODE_OK;
   struct stat fstat;
-  sprintf(path,"%s%s",WEB_DIR,page_arg);
-
-
-
 
   fprintf(dialogue,"> path : %s\n",path);
   if(stat(path,&fstat)!=0 || !S_ISREG(fstat.st_mode)){
@@ -110,6 +110,9 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
     int bytes;
     while((bytes=read(fd,ligne,MAX_BUFFER))>0) write(1,ligne,bytes);
     close(fd);
+      
+     
+    //execlp("open", "open", path, NULL);
     }
     }
   }
@@ -119,3 +122,11 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
 fclose(dialogue);
 return 0;
 }
+
+/*
+ * Problème argument strtok
+ * execlp interrompt serveur ==> ouvrir un autre terminal?
+ * 
+ * 
+ * 
+ */
