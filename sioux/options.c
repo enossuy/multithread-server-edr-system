@@ -11,8 +11,6 @@
 #include <sys/stat.h>
 #include <getopt.h>
 
-#define MAX_CONNEXIONS 5
-
 
 
 void err_syntax(void)

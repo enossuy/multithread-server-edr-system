@@ -9,7 +9,7 @@
 #define WEB_DIR  "./www"
 #define PAGE_NOTFOUND "error.html"
 #define MAX_BUFFER 1024
-
+#define MAX_BUFFER_PATH 2000
 #define CODE_OK  200
 #define CODE_NOTFOUND 404
 
@@ -22,7 +22,7 @@ FILE *dialogue=fdopen(s,"a+");
   char cmd[MAX_BUFFER];
   char page[MAX_BUFFER];
   char proto[MAX_BUFFER];
-  char path[2048];
+  char path[MAX_BUFFER_PATH];
   char type[MAX_BUFFER];
 if(dialogue==NULL){ perror("gestionClient.fdopen"); exit(EXIT_FAILURE); }
 
