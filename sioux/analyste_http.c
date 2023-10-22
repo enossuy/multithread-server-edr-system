@@ -23,6 +23,7 @@ FILE *dialogue=fdopen(s,"a+");
   char page[MAX_BUFFER];
   char proto[MAX_BUFFER];
   char path[MAX_BUFFER_PATH];
+  char complete_path[MAX_BUFFER_PATH];
   char type[MAX_BUFFER];
 if(dialogue==NULL){ perror("gestionClient.fdopen"); exit(EXIT_FAILURE); }
 
@@ -41,45 +42,38 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
 
   /*On cherche si il ya "?""*/
   char *page_arg = strtok(page, "?");
+  page_arg = strtok(NULL, "?");
 
+  if(strcmp("/",page) == 0)
+  {
+    strcpy(path,"./www/index.html");
+  }
+  else
+  {
+    sprintf(path,"%s%s",WEB_DIR,page);
     if (page_arg != NULL) {
 
-      fprintf(dialogue,"page extraite : %s\n", page);
-
-
+      /*Mise en place du chemin pour le fichier CSV*/
       char page_to_extract[MAX_BUFFER];
       strcpy(page_to_extract,page);
-      char *csv = strtok(page_to_extract,".html");
-      char *csv_path;
+      char *csv = strtok(page_to_extract,".");
+      size_t sizeCSV = strlen(WEB_DIR) + 1 +  strlen(page_to_extract) + 1;
+      char *csv_path = (char *) malloc( sizeCSV );
 
-      size_t sizeCSV = strlen( WEB_DIR ) + 1 +  strlen( csv ) + 1;
-      sprintf(path,"%s%s",WEB_DIR,page_arg);
-      
-      if(strcmp("./www/",path) == 0)
-      {
-        strcpy(path,"./www/index.html");
-      }
-      else {
-        csv_path = (char *) malloc( sizeCSV );
-        strcpy(csv_path,WEB_DIR);
-        strcat(csv_path,csv);
-        strcat(csv_path,".csv");
-        fprintf(dialogue,"csv : %s\n",csv_path);
-      }
+      strcpy(csv_path,WEB_DIR);
+      strcat(csv_path,page_to_extract);
+      strcat(csv_path,".csv");
 
-        char *argument = strtok(NULL, "?");
-        if (argument != NULL) {
-
-            FILE *vote_csv=fopen(csv_path,"a+");
-            fprintf(dialogue,"argument dans la requete: %s\n", argument);
-            fprintf(vote_csv,"%s;",argument);
-            fclose(vote_csv);
-
-        } else {
-            fprintf(dialogue,"pas d'argument dans la requete\n");
-        }
+      /*Création/Ecriture CSV*/
+      FILE *vote_csv=fopen(csv_path,"a+");
+      fprintf(vote_csv,"%s;",page_arg);
+      fclose(vote_csv);
     }
-
+    else
+    {
+      fprintf(dialogue,"Pas d'argument \n");
+    }
+  }
 
   if(strcasecmp(cmd,"GET")==0){
   int code=CODE_OK;
@@ -90,6 +84,8 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
     sprintf(path,"%s/%s",WEB_DIR,PAGE_NOTFOUND);
     fprintf(dialogue,"page non trouvée\n");
     code=CODE_NOTFOUND;
+
+    //ici aussi open error.html?
     }
   else{
     fprintf(dialogue,"page trouvée\n");
@@ -99,7 +95,8 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
     if(strcmp(end-4,".png")==0) strcpy(type,"image/png");
     if(strcmp(end-4,".jpg")==0) strcpy(type,"image/jpg");
     if(strcmp(end-4,".gif")==0) strcpy(type,"image/gif");
-    fprintf(stdout,"HTTP/1.0 %d\r\n",code);
+    fprintf(stdout,"\n\033[92mEn-tête\033[0m\r\n");
+    fprintf(stdout,"HTTP/1.0 CODE : %d\r\n",code);
     fprintf(stdout,"Server: CWeb\r\n");
     fprintf(stdout,"Content-type: %s\r\n",type);
     fprintf(stdout,"Content-length: %ld\r\n",fstat.st_size);
@@ -112,7 +109,7 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
     close(fd);
       
      
-    //execlp("open", "open", path, NULL);
+    execlp("open", "open", path, NULL); // fork
     }
     }
   }
