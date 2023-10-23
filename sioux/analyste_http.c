@@ -107,9 +107,10 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
     int bytes;
     while((bytes=read(fd,ligne,MAX_BUFFER))>0) write(1,ligne,bytes);
     close(fd);
-      
-     
-    execlp("open", "open", path, NULL); // fork
+
+    int pid = fork();
+    if(pid == -1) 
+      execlp("open", "open", path, NULL); // fork
     }
     }
   }
@@ -120,10 +121,3 @@ fclose(dialogue);
 return 0;
 }
 
-/*
- * Problème argument strtok
- * execlp interrompt serveur ==> ouvrir un autre terminal?
- * 
- * 
- * 
- */
