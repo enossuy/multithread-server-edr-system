@@ -109,8 +109,8 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
     close(fd);
 
     int pid = fork();
-    if(pid == -1) 
-      execlp("open", "open", path, NULL); // fork
+    if(pid  == 0) //fils
+      execlp("open", "open", path, NULL); // fork ?
     }
     }
   }
