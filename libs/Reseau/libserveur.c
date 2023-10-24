@@ -65,23 +65,4 @@ return s;
 }
 
 
-void *boucleServeur(void *arg){
-
-int dialogue;
-int *ecoute = (int *)arg;
-
-while(1){
-
-    /* Attente d'une connexion */
-    if((dialogue=accept(*ecoute,NULL,NULL))<0) break;//ou exit?
-    
-
-    printf("\033[93mClient connecté\033[0m\r\n");
-    /* Passage de la socket de dialogue a la fonction de traitement */
-    if(gestionClient(dialogue)<0){ shutdown(*ecoute,SHUT_RDWR); break;}
-    }
-    return NULL;
-}
-
-
 

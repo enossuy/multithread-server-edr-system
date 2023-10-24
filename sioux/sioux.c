@@ -31,7 +31,7 @@ int main(int argc,char *argv[]){
    
         /* Lancement de la boucle d'ecoute */
 
-        MultiThread(MAX_CONNEXIONS, s);
+        boucleServeur(s);
 
         return 0;
 } 

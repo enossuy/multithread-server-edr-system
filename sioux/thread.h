@@ -1,1 +1,1 @@
-void MultiThread(int nb_connexions, int socket);
+int boucleServeur(int ecoute);
