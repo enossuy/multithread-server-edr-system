@@ -2,7 +2,7 @@
 SOURCES = $(wildcard *.c)
 OBJECTS = $(SOURCES:.c=.o)
 TARGET = serveur_madz
-LDFLAGS =  -L../libs/Reseau -lserveur
+LDFLAGS =  -L../libs/Reseau -lserveur -pthread
 
 default:
 	gcc -c $(SOURCES) 

@@ -1,9 +1,7 @@
 #include "../libs/Reseau/libserveur.h"
 #include "./options.h"
 #include "./analyste_http.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "./thread.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,9 +10,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+
 #define MAX_CONNEXIONS 5
-
-
 
 int main(int argc,char *argv[]){
 
@@ -32,12 +29,11 @@ int main(int argc,char *argv[]){
         else
                 printf("Port libre !\n");
    
-/* Lancement de la boucle d'ecoute */
-        boucleServeur(s,gestionClient);
+        /* Lancement de la boucle d'ecoute */
 
+        MultiThread(MAX_CONNEXIONS, s);
 
-
-return 0;
+        return 0;
 } 
 
 

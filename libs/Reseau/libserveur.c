@@ -9,6 +9,7 @@
 #include <netinet/tcp.h>
 #include <fcntl.h>
 #include <netdb.h>
+#include "../../sioux/analyste_http.h"
 #include "libserveur.h"
 
 
@@ -63,18 +64,23 @@ if(statut<0){ shutdown(s,SHUT_RDWR); return -2; }
 return s;
 }
 
-int boucleServeur(int ecoute,int (*traitement)(int)){
+
+void *boucleServeur(void *arg){
+
 int dialogue;
+int *ecoute = (int *)arg;
+
 while(1){
 
     /* Attente d'une connexion */
-    if((dialogue=accept(ecoute,NULL,NULL))<0) return -1;
+    if((dialogue=accept(*ecoute,NULL,NULL))<0) break;//ou exit?
     
 
     printf("\033[93mClient connecté\033[0m\r\n");
     /* Passage de la socket de dialogue a la fonction de traitement */
-    if(traitement(dialogue)<0){ shutdown(ecoute,SHUT_RDWR); return 0;}
+    if(gestionClient(dialogue)<0){ shutdown(*ecoute,SHUT_RDWR); break;}
     }
+    return NULL;
 }
 
 
