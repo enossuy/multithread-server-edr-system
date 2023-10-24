@@ -13,26 +13,23 @@
 #define MAX_THREAD 1000
 
 int boucleServeur(int ecoute){
-int dialogue;
-pthread_t tid_threads[MAX_THREAD];
-int i = 0;
+    int dialogue;
+    pthread_t tid_threads;
+    //detache
+    int i = 0;
 
-while(1){
+    while(1){
     	 
-    /* Attente d'une connexion */
-    if((dialogue=accept(ecoute,NULL,NULL))<0) return -1;
+        /* Attente d'une connexion */
+        if((dialogue=accept(ecoute,NULL,NULL))<0) return -1;
      
-    i++;	
-    printf("\033[93mClient connecté\033[0m\r\n");
-    /* Passage de la socket de dialogue a la fonction de traitement */
-    pthread_create(&tid_threads[i],NULL,gestionClient,&dialogue);
-    if(dialogue<0){ shutdown(ecoute,SHUT_RDWR); return 0;}
-  
-}
-   for (int j = 0; j < i; j++) {
-        pthread_join(tid_threads[i], NULL) ; // mettre test status !=0
-    }
+        i++;
+        printf("\033[93mClient connecté\033[0m\r\n");
+        /* Passage de la socket de dialogue a la fonction de traitement */
+        pthread_create(&tid_threads[i],NULL,gestionClient,&dialogue);
+        if(dialogue<0){ shutdown(ecoute,SHUT_RDWR); return 0;}
 
+    }
 }
 
 
