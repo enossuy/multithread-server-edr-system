@@ -19,7 +19,7 @@ int boucleServeur(int ecoute){
     while(1){
     	 
         /* Attente d'une connexion */
-        if((dialogue=accept(ecoute,NULL,NULL))<0) return -1;
+        if((dialogue=accept(ecoute,NULL,NULL))<0) return -1;//mettre free, variable differente voir page 35 cours thread
 
         printf("\033[93mClient connecté\033[0m\r\n");
         /* Passage de la socket de dialogue a la fonction de traitement */
