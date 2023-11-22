@@ -1,7 +1,7 @@
 #include "../libs/Reseau/libserveur.h"
-#include "./options.h"
-#include "./analyste_http.h"
-#include "./thread.h"
+#include "options.h"
+#include "analyste_http.h"
+#include "thread.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,7 +11,7 @@
 #include <sys/stat.h>
 
 
-#define MAX_CONNEXIONS 5
+#define MAX_CONNEXIONS 50
 
 int main(int argc,char *argv[]){
 
@@ -31,10 +31,13 @@ int main(int argc,char *argv[]){
    
         /* Lancement de la boucle d'ecoute */
 
-        boucleServeur(s);
+        boucleServeur(s,gestionClientThread);
 
         return 0;
 } 
+
+
+
 
 
 

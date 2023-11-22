@@ -1,1 +1,1 @@
-void* gestionClient(void *arg);
+int gestionClient(int s);

@@ -16,12 +16,11 @@
 
 #define MAX_LIGNE 1024
 
-void* gestionClient(void *arg){
-
-int *s = (int *)arg;
+int gestionClient(int s){
 
 
-FILE *dialogue=fdopen(*s,"a+");
+
+FILE *dialogue=fdopen(s,"a+");
   char cmd[MAX_BUFFER];
   char page[MAX_BUFFER];
   char proto[MAX_BUFFER];
@@ -121,6 +120,6 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
 
 /* Termine la connexion */
 fclose(dialogue);
-*s = 0;
+return 0;
 }
 

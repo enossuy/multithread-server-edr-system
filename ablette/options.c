@@ -32,7 +32,9 @@ int parsing(int valopt, char *optarg)
             else
                 err_syntax();
             break;
-
+        case 'i':
+                interface = optarg;//les mettre en pointeur en parametre
+                ports = optarg;
         case '?':
             err_syntax();
             break;
@@ -52,7 +54,7 @@ int analyseArguments(int argc,char *argv[]){
     int port_num;
     int i = 0;
 
-    while ((val_opt = getopt_long(argc, argv, "p:0",long_options, &option_index)) != -1) // si suivi de ":" ==> besoin d argument
+    while ((val_opt = getopt_long(argc, argv, "i:p:0",long_options, &option_index)) != -1) // si suivi de ":" ==> besoin d argument
         {
             port_num = parsing(val_opt,optarg);
             i = 1;

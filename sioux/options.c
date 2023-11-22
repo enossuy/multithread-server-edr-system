@@ -59,8 +59,8 @@ int analyseArguments(int argc,char *argv[]){
         }
 
         if(i == 0){
-            printf("Port non spécifié\n");
-            exit(-1);
+            printf("Port non spécifié, port 80 utilisé\n");
+            port_num=80;
         }
 
     return port_num;

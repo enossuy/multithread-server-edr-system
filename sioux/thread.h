@@ -1,1 +1,1 @@
-int boucleServeur(int ecoute);
+void *gestionClientThread(void *arg);
