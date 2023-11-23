@@ -19,7 +19,7 @@ void err_syntax(void)
     printf("Syntaxe incorrecte : -p <port> ou --port <port>\n");
 }
 
-int parsing(int valopt, char *optarg, char *interface)
+int[] parsing(int valopt, char *optarg, char *interface)
 {
     int port_num = -1;
 

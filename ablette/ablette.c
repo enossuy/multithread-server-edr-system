@@ -21,7 +21,6 @@ int main(int argc,char *argv[]){
     short int port = getPort(argc,argv,interface); //service = port, char *service ?
 
 
-
     printf("Ports = %d");
 
     return 0;
