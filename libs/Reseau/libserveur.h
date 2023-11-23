@@ -1,3 +1,3 @@
 int initialisationServeur(short int *port,int connexions);
-int boucleServeur(int ecoute,void* (*traitement)(void*));
+int boucleServeur(int ecoute,int (*traitement)(int));
 

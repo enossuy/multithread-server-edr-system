@@ -3,15 +3,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <pthread.h>
+#include "thread.h"
 
-void *gestionClientThread(void *arg)
+int gestionClientThread(int s)
 {
-    int *s = (int*)arg;   
-    gestionClient(*s);
-    free(s);
-    return NULL;
+    pthread_t t;
+    int *socket = (int*) malloc(sizeof(int));
+    *socket = s;
+    pthread_create(&t, NULL, threadClient, (void*) socket);//free dedans
+    pthread_detach(t);
+    return 0;
 }
 
 
 
 
+void *threadClient(void* arg){
+    gestionClient(*(int*)arg);
+    free(arg);
+}

@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <getopt.h>
+#include "./options.h"
 
 int macAddress[6];
 
@@ -18,7 +19,7 @@ void err_syntax(void)
     printf("Syntaxe incorrecte : -p <port> ou --port <port>\n");
 }
 
-int parsing(int valopt, char *optarg)
+int parsing(int valopt, char *optarg, char *interface)
 {
     int port_num = -1;
 
@@ -34,7 +35,6 @@ int parsing(int valopt, char *optarg)
             break;
         case 'i':
                 interface = optarg;//les mettre en pointeur en parametre
-                ports = optarg;
         case '?':
             err_syntax();
             break;
@@ -43,20 +43,22 @@ int parsing(int valopt, char *optarg)
     return port_num;
 }
 
-int analyseArguments(int argc,char *argv[]){
+int analyseArguments(int argc,char *argv[],  char *interface){
     static struct option long_options[] = {
             {"port",     required_argument, 0,  'p' },
+            {"interface", required_argument, 0, 'i'},
             {0,     0, 0,  0 }
             };
 
     int option_index = 0;
     int val_opt;
     int port_num;
+
     int i = 0;
 
     while ((val_opt = getopt_long(argc, argv, "i:p:0",long_options, &option_index)) != -1) // si suivi de ":" ==> besoin d argument
         {
-            port_num = parsing(val_opt,optarg);
+            port_num = parsing(val_opt,optarg,interface);
             i = 1;
         }
 
@@ -69,34 +71,8 @@ int analyseArguments(int argc,char *argv[]){
 }
 
 
-void parseOptions(int argc,char **argv)
-{
-  int index;
-  int c;
 
-  /* Definition des options */
 
-  static char *options="i:dsbu:";
-  static const struct option longOptions[]={
-    {"interface",1,0,'i'},
-    {"port",required_argument, 0,'p'},
-    {0,0,0,0}
-    } ;
 
-  /* Analyse lexicale */
 
-  while((c=getopt_long(argc,argv,options,longOptions,&index))>0)
-    switch(c){
-      case 'i': ifname=optarg; break;
-      case 'p': mode=MODE_DISPLAY; break;
-      case 'u':{
-        int x[ETHER_ADDR_LEN];
- int i,nb=sscanf(optarg,"%x:%x:%x:%x:%x:%x",x+0,x+1,x+2,x+3,x+4,x+5);
- if(nb!=ETHER_ADDR_LEN) usage(argv[0]);
- for(i=0;i<ETHER_ADDR_LEN;i++) macAddress[i]=x[i];
- unicast=1;
-        break; }
-      default: usage(argv[0]); break;
-      }
-  if(optind<argc) usage(argv[0]);
-}
+

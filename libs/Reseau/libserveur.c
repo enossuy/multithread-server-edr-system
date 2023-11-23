@@ -9,9 +9,8 @@
 #include <netinet/tcp.h>
 #include <fcntl.h>
 #include <netdb.h>
-#include "../../sioux/analyste_http.h"
 #include "libserveur.h"
-#include <pthread.h>
+
 
 
 int initialisationServeur(short int *port,int connexions){
@@ -64,10 +63,10 @@ if(statut<0){ shutdown(s,SHUT_RDWR); return -2; }
 return s;
 }
 
-int boucleServeur(int ecoute,void* (*traitement)(void*)){
-  pthread_t t;
-int dialogue;
-while(1){
+int boucleServeur(int ecoute,int (*traitement)(int)){
+
+  int dialogue;
+  while(1){
 
     /* Attente d'une connexion */
     if((dialogue=accept(ecoute,NULL,NULL))<0) return -1;
@@ -75,12 +74,6 @@ while(1){
 
     printf("\033[93mClient connecté\033[0m\r\n");
 
-
-    int *arg = (int *)malloc(sizeof(int));
-    *arg = dialogue;
-
-    pthread_create(&t, NULL, traitement, arg);//free dedans
-    pthread_detach(t);
-  
+    if(traitement(dialogue)<0){ shutdown(ecoute,SHUT_RDWR); return 0;}
     }
 }

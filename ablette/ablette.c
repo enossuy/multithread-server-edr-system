@@ -1,16 +1,28 @@
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <getopt.h>
+#include "./options.h"
 
-#include <pcap.h>
+
+int main(int argc,char *argv[]){
+
+
+    char *interface;
+
+    short int port = getPort(argc,argv,interface); //service = port, char *service ?
 
 
 
-/** Recherche du numero systeme d'une interface **/
-int getInterfaceIndex(int sock,char *ifname){
-  struct ifreq ifr;
-  strcpy(ifr.ifr_name,ifname);
-  if(ioctl(sock,SIOCGIFINDEX,&ifr)<0){
-    perror("getInterfaceIndex.ioctl");
-    exit(-1);
-    }
-  return ifr.ifr_ifindex;
-  }
+    printf("Ports = %d");
+
+    return 0;
+}

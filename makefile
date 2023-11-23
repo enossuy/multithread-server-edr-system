@@ -16,7 +16,7 @@ export CDEBUG = -g -DDEBUG
 # Constantes liees au projet
 #
 
-DIRS= libs sioux #EDR
+DIRS= libs sioux ablette #EDR
 
 #
 # La cible generale
@@ -35,6 +35,3 @@ clean: $(patsubst %, _clean_%, $(DIRS))
 
 $(patsubst %,_clean_%,$(DIRS)):
 	cd $(patsubst _clean_%,%,$@) && make clean
-
-
-
