@@ -13,7 +13,7 @@
 #define MAX_BUFFER_PATH 2000
 #define CODE_OK  200
 #define CODE_NOTFOUND 404
-
+#define HTML_RESPONSE "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body><h1>Hello, World!</h1></body></html>"
 
 #define MAX_LIGNE 1024
 
@@ -24,6 +24,7 @@ int gestionClient(int s){
 FILE *dialogue=fdopen(s,"a+");
   char cmd[MAX_BUFFER];
   char page[MAX_BUFFER];
+  char header[MAX_BUFFER_PATH];
   char proto[MAX_BUFFER];
   char path[MAX_BUFFER_PATH];
   char complete_path[MAX_BUFFER_PATH];
@@ -59,8 +60,13 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
 
     /*Création/Ecriture CSV*/
     FILE *ablette=fopen("./www/ablette.html","w+");
+    fprintf(ablette,"=== Classement ===\n");
+    fprintf(ablette,"<br>\n");
     for(int i = 0 ; i < 10 ; i++)
-      fprintf(ablette,"%s",result[i]);
+    {
+      fprintf(ablette,"%d) %s\r\n",i+1,result[i]);
+      fprintf(ablette,"<br>\n");
+    }
     fclose(ablette);
   }
   else
@@ -111,24 +117,24 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
     if(strcmp(end-4,".jpg")==0) strcpy(type,"image/jpg");
     if(strcmp(end-4,".gif")==0) strcpy(type,"image/gif");
     fprintf(stdout,"\n\033[92mEn-tête\033[0m\r\n");
-    fprintf(stdout,"HTTP/1.0 CODE : %d\r\n",code);
+    fprintf(stdout,"HTTP/1.1 CODE : %d\r\n",code);
     fprintf(stdout,"Server: CWeb\r\n");
     fprintf(stdout,"Content-type: %s\r\n",type);
     fprintf(stdout,"Content-length: %ld\r\n",fstat.st_size);
     fprintf(stdout,"\r\n");
     fflush(stdout);
-    int fd=open(path,O_RDONLY);
+    int fd=open(path,O_RDWR);
     if(fd>=0){
     int bytes;
-    while((bytes=read(fd,ligne,MAX_BUFFER))>0) write(1,ligne,bytes);
-    send(s, HTML_RESPONSE,strlen(HTML_RESPONSE),0);
+    sprintf(header,"HTTP/1.1 %d\r\nContent-Type: %s\r\nContent-length: %ld\r\n\r\n",code,type,fstat.st_size);
+
+    send(s, header,strlen(header),0);
+    while((bytes=read(fd,ligne,MAX_BUFFER))>0) 
+    {
+      send(s, ligne,bytes,0);
+    }
     close(fd);
 
-
-
-    /*int pid = fork();
-    if(pid  == 0) //fils
-      execlp("open", "open", path, NULL); // fork ?*/
     }
     }
   }

@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <netdb.h>
 #include "libserveur.h"
-#define HTML_RESPONSE "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body><h1>Hello, World!</h1></body></html>"
+
 
 
 int initialisationServeur(short int *port,int connexions){
@@ -74,7 +74,6 @@ int boucleServeur(int ecoute,int (*traitement)(int)){
 
     printf("\033[93mClient connecté\033[0m\r\n");
 
-     send(dialogue, HTML_RESPONSE,strlen(HTML_RESPONSE),0);
 
     if(traitement(dialogue)<0){ shutdown(ecoute,SHUT_RDWR); return 0;}
     }
