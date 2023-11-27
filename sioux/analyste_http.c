@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
 #include <string.h>
 #include <fcntl.h>
-
+#include "../libs/IPC/libpartage.h"
 
 #define WEB_DIR  "./www"
 #define PAGE_NOTFOUND "error.html"
@@ -49,6 +50,18 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
   if(strcmp("/",page) == 0)
   {
     strcpy(path,"./www/index.html");
+  }
+  else if(strcmp("/ablette.html",page) == 0)
+  {
+    char result[10][16];
+    int id = read_p(result);
+    strcpy(path,"./www/ablette.html");
+
+    /*Création/Ecriture CSV*/
+    FILE *ablette=fopen("./www/ablette.html","w+");
+    for(int i = 0 ; i < 10 ; i++)
+      fprintf(ablette,"%s",result[i]);
+    fclose(ablette);
   }
   else
   {
@@ -108,11 +121,14 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
     if(fd>=0){
     int bytes;
     while((bytes=read(fd,ligne,MAX_BUFFER))>0) write(1,ligne,bytes);
+    send(s, HTML_RESPONSE,strlen(HTML_RESPONSE),0);
     close(fd);
 
-    int pid = fork();
+
+
+    /*int pid = fork();
     if(pid  == 0) //fils
-      execlp("open", "open", path, NULL); // fork ?
+      execlp("open", "open", path, NULL); // fork ?*/
     }
     }
   }

@@ -18,9 +18,13 @@
 #include <time.h>
 #include <stdbool.h>
 #include "../libs/Reseau/libserveur.h"
+#include "../libs/IPC/libpartage.h"
 
 #define MAX_SRC 100
+#define TOP 10
  
+int id;
+char top10[TOP][IFNAMSIZ];
 struct source {
     char adresse[IFNAMSIZ];
     int packet_cpt;
@@ -73,19 +77,19 @@ void packet_handler(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u
         char source_ip[INET_ADDRSTRLEN];
         inet_ntop(AF_INET, &(ip_header->ip_src), source_ip, INET_ADDRSTRLEN);
         printf("| Date : %s ",ctime((const time_t*)&pkthdr->ts.tv_sec));
-        printf("| IP source : %s\n", source_ip);
+        printf("| IP source : \033[93m%s\033[0m\r\n", source_ip);
         sort_src(source_ip);
     }
     for(int i = 0 ; i<cpt_source; i++)
     {
-        if(i<5)
+        if(i<TOP)
             printf("num : %d ip: %s cpt :%d \n",i+1,sources[i].adresse,sources[i].packet_cpt);
     }
     printf("================================\n\n");
 
-
-    
-    
+    for(int i = 0; i < TOP ; i++)
+        strcpy(top10[i],sources[i].adresse);
+   id = write_p(top10);
 }
 
 int main(int argc, char *argv[]) {
@@ -147,7 +151,7 @@ int main(int argc, char *argv[]) {
     }
 
     strcat(expression,expression2);
-    printf("expression : %se\n", expression);
+    printf("expression : %s\n", expression);
     //char eexpression[] = "dst host 192.168.0.16 and (port 80 or port 443)";
 
     if (pcap_compile(handler, &fp, expression, 0, PCAP_NETMASK_UNKNOWN) == -1) {
@@ -170,6 +174,7 @@ int main(int argc, char *argv[]) {
         exit(-1);
     }
 
+    //free_shm(id);
     pcap_close(handler);
     return 0;
 }

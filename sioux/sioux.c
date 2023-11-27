@@ -33,6 +33,7 @@ int main(int argc,char *argv[]){
 
         boucleServeur(s,gestionClientThread);
 
+       // free_shm(id);
         return 0;
 } 
 
