@@ -1,9 +1,3 @@
-
-#include <getopt.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
 #include "options.h"
 
 #define MAX_PORTS 20 // Nombre maximum de ports dans la liste

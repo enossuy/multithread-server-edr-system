@@ -1,14 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <fcntl.h>
-#include <netdb.h>
 #include "libserveur.h"
 
 
@@ -72,7 +61,7 @@ int boucleServeur(int ecoute,int (*traitement)(int)){
     if((dialogue=accept(ecoute,NULL,NULL))<0) return -1;
     
 
-    printf("\033[93mClient connecté\033[0m\r\n");
+    printf("\033[93mConnexion\033[0m\r\n");
 
 
     if(traitement(dialogue)<0){ shutdown(ecoute,SHUT_RDWR); return 0;}

@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 #include <string.h>
 #include <fcntl.h>
 #include "../libs/IPC/libpartage.h"
@@ -54,19 +56,41 @@ while(fgets(ligne,MAX_LIGNE,dialogue)!=NULL)
   }
   else if(strcmp("/ablette.html",page) == 0)
   {
-    char result[10][16];
+    char result[TOP][16];
+    char noms[TOP][100];
     int id = read_p(result);
+
+    struct hostent *host_entry;
+    struct in_addr addr;
+
+    for(int i = 0; i < TOP; i++) { 
+      inet_aton(result[i], &addr);
+      host_entry = gethostbyaddr(&addr, sizeof(addr), AF_INET);
+      
+      if (host_entry == NULL) {
+          strcpy(noms[i], "<font color=\"red\">Pas de nom d'h&ocirc;te</font>");
+      } else {
+          strcpy(noms[i], host_entry->h_name);
+      }
+    }
+
     strcpy(path,"./www/ablette.html");
 
-    /*Création/Ecriture CSV*/
+    /*Création/Ecriture HTML*/
     FILE *ablette=fopen("./www/ablette.html","w+");
-    fprintf(ablette,"=== Classement ===\n");
-    fprintf(ablette,"<br>\n");
-    for(int i = 0 ; i < 10 ; i++)
-    {
-      fprintf(ablette,"%d) %s\r\n",i+1,result[i]);
-      fprintf(ablette,"<br>\n");
+
+    /*Creation tableau avec noms*/
+    fprintf(ablette, "<html><head><title>Classement Top %d</title></head><body>\n",TOP);
+    fprintf(ablette, "<h1>Classement Top %d</h1>\n",TOP);
+    fprintf(ablette, "<table border=\"1\">\n");
+    fprintf(ablette, "<tr><th>Position</th><th>Adresse IP</th><th>Nom de l'h&ocirc;te</th></tr>\n");
+
+    for (int i = 0; i < TOP; i++) {
+      fprintf(ablette, "<tr><td>%d</td><td>%s</td><td>%s</td></tr>\n", i + 1, result[i], noms[i]);
     }
+
+    fprintf(ablette, "</table>\n");
+    fprintf(ablette, "</body></html>\n");
     fclose(ablette);
   }
   else

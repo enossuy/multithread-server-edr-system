@@ -1,96 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <netinet/in.h>
-#include <net/if.h>
-#include <arpa/inet.h>
-#include <netinet/ether.h>
-#include <netinet/ip.h>
-#include <getopt.h>
-#include <pcap.h>
-#include "options.h"
-#include <time.h>
-#include <stdbool.h>
-#include "../libs/Reseau/libserveur.h"
-#include "../libs/IPC/libpartage.h"
+#include "handler.h"
 
-#define MAX_SRC 100
-#define TOP 10
- 
-int id;
-char top10[TOP][IFNAMSIZ];
-struct source {
-    char adresse[IFNAMSIZ];
-    int packet_cpt;
-};
-
-struct source sources[MAX_SRC];
-int cpt_source = 0;
-
-int compare(const void *a, const void *b) {
-  
-    struct source *sourceA = (struct source *)a;
-    struct source *sourceB = (struct source *)b;
-  
-    return (sourceB->packet_cpt - sourceA->packet_cpt); // si on inverse ca fait decroissant
-}
-
-void sort_src(char *source_ip)
-{
-    bool already_in = false;
-    int index;
-    for(int i = 0 ; i < cpt_source; i++)
-    {
-        if(strcmp(sources[i].adresse,source_ip) == 0){
-            already_in = true;
-            index = i; 
-            break;   
-        }
-    }
-
-    if(!already_in){ 
-        strcpy(sources[cpt_source].adresse,source_ip);
-        sources[cpt_source].packet_cpt = 1;
-        cpt_source++;
-    }else{
-        sources[index].packet_cpt++;
-    }
-
-    qsort(sources, cpt_source, sizeof(struct source), compare);
-}
-
-void packet_handler(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
-    printf("Paquet capturé. Taille : %d octets", pkthdr->len);
-    struct ether_header *eth_header;
-    struct ip *ip_header;
-
-    eth_header = (struct ether_header *)packet;
-
-    if (ntohs(eth_header->ether_type) == ETHERTYPE_IP) { // protocole IP
-        ip_header = (struct ip *)(packet + sizeof(struct ether_header));
-        char source_ip[INET_ADDRSTRLEN];
-        inet_ntop(AF_INET, &(ip_header->ip_src), source_ip, INET_ADDRSTRLEN);
-        printf("| Date : %s ",ctime((const time_t*)&pkthdr->ts.tv_sec));
-        printf("| IP source : \033[93m%s\033[0m\r\n", source_ip);
-        sort_src(source_ip);
-    }
-    for(int i = 0 ; i<cpt_source; i++)
-    {
-        if(i<TOP)
-            printf("num : %d ip: %s cpt :%d \n",i+1,sources[i].adresse,sources[i].packet_cpt);
-    }
-    printf("================================\n\n");
-
-    for(int i = 0; i < TOP ; i++)
-        strcpy(top10[i],sources[i].adresse);
-   id = write_p(top10);
-}
+extern int id_shm;
 
 int main(int argc, char *argv[]) {
     char interface[20] = ""; 
@@ -109,7 +19,6 @@ int main(int argc, char *argv[]) {
     close(fd);
     char ad_IP[IFNAMSIZ]; 
     strncpy(ad_IP,inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr),IFNAMSIZ-1);//conversion binaire vers str
-    printf("%s\n", ad_IP);
 
 
     /*Affichage, test parsing + IP*/
@@ -131,9 +40,8 @@ int main(int argc, char *argv[]) {
     }
 
     struct bpf_program fp;
-   
 
-    /*=== Construction de l'expression pour le filtre ===*///"dst host 192.168.17.114 and (port 80 or port 443)"
+    /*=== Construction de l'expression pour le filtre ===*/// De base : "dst host 192.168.17.114 and (port 80 or port 443)"
     char expression[100] = "dst host ";
     strcat(expression,ad_IP);
     char text[15];
@@ -152,7 +60,8 @@ int main(int argc, char *argv[]) {
 
     strcat(expression,expression2);
     printf("expression : %s\n", expression);
-    //char eexpression[] = "dst host 192.168.0.16 and (port 80 or port 443)";
+    
+    //compilation
 
     if (pcap_compile(handler, &fp, expression, 0, PCAP_NETMASK_UNKNOWN) == -1) {
        perror("Erreur compilation filtre\n");
@@ -160,6 +69,7 @@ int main(int argc, char *argv[]) {
         exit(-1);
     }
 
+    //filtre
     if (pcap_setfilter(handler, &fp) == -1) {
         perror("Erreur set filtre\n");
         pcap_close(handler);
@@ -168,13 +78,15 @@ int main(int argc, char *argv[]) {
 
     printf("Capture sur l'interface %s en cours\n", interface);
 
+    //boucle de capture
+
     if (pcap_loop(handler, -1, packet_handler, NULL) != 0) {
         perror("Erreur capture paquets\n");
         pcap_close(handler);
         exit(-1);
     }
 
-    //free_shm(id);
+    free_shm(id_shm);
     pcap_close(handler);
     return 0;
 }
