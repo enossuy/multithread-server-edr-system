@@ -60,7 +60,6 @@ int boucleServeur(int ecoute,int (*traitement)(int)){
     /* Attente d'une connexion */
     if((dialogue=accept(ecoute,NULL,NULL))<0) return -1;
     
-
     printf("\033[93mConnexion\033[0m\r\n");
 
 

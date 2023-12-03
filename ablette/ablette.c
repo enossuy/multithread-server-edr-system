@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
     int fd;
     struct ifreq ifr;
 
-    /* ===== Recuperation adresse IPv4 de l'interface ===== */
+    /* ===== Recuperation adresse IPv4 de l'interface ====== */
     fd = socket(AF_INET, SOCK_DGRAM, 0);
     ifr.ifr_addr.sa_family = AF_INET; //IPv4
     strncpy(ifr.ifr_name, interface, IFNAMSIZ-1); // interface

@@ -17,7 +17,7 @@ void sort_src(char *source_ip)
 {
     bool already_in = false;
     int index;
-    for(int i = 0 ; i < cpt_source; i++)//recherche de l adresse capturée dans le tableau
+    for(int i = 0 ; i < cpt_source; i++)// recherche de l adresse capturée dans le tableau
     {
         if(strcmp(sources[i].adresse,source_ip) == 0){
             already_in = true;

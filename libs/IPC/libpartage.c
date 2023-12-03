@@ -41,6 +41,7 @@ void free_shm(int id)
     shmctl(id, IPC_RMID, NULL);
 }
 
+
 int write_p(char tab[TOP][16]) {
     
     key_t key = ftok("/tmp", 'B');

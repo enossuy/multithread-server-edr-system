@@ -30,6 +30,7 @@ int parseArguments(int argc, char *argv[], char *interface, int ports[]) {
         }
     }
 
+
     /*si rien, mettre ports et interface par defaut*/
     if (strlen(interface) == 0 || cpt == 0) {
         strncpy(interface, "eth0", sizeof(interface));
