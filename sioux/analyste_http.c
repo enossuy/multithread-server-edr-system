@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include "../libs/IPC/libpartage.h"
 
+
 #define WEB_DIR  "./www"
 #define PAGE_NOTFOUND "error.html"
 #define MAX_BUFFER 1024

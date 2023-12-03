@@ -16,7 +16,7 @@ Pour utiliser `ablette`, il faut taper dans le dossier ablette :
 sudo ./ablette -i <interface> -p <ports>
 ```
 Si plusieurs ports sont spécifiés, ils doivent être séparés par des virgules et sans espace.
-Ex: -p 443,80,8000
+Exemple: -p 443,80,8000
 
 
 
